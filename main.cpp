@@ -1,33 +1,74 @@
 #include <iostream>
 #include <string>
 
+#include "src/char_py_string.hpp"
+
 #include "src/datafile_content.hpp"
 #include "src/platelets_distance.hpp"
 
 
-int main(int argc, char **argv)
+#define MMT_ATOM_TYPE 1
+#define PLATELETS_COUNT 2
+
+
+std::array<std::vector<std::string>,4> get_fnames(std::string regime)
 {
-    std::string dirname("/media/anton/Seagate Expansion Drive/dpd_calculations/"
-        "poly_mod_likeness/mmt_r10_n2_mod_n400_tail5_poly_p10_n50156/datafiles/");
+    std::string dpd_dir("/media/anton/Seagate Expansion Drive/dpd_calculations/");
+    std::array<std::vector<std::string>,4> fnames;
 
-    //std::string data_fname("/home/anton/"
-    //    "parallel_isolated_mmt_r10_n2_mod_n400_tail5_poly_p10_n50156.data");
-        //"dpd_d.9000.data");
-
-    // sec        cpp_old    py3    cpp_new
-    // for  1:    10         8      2
-    // for  5:    50         41     9
-
-    size_t mmt_atom_type(1);
-    size_t platelets_count(2);
-
-    for (size_t idx = 0; idx < 10; idx++)
+    if (regime == "poly_mod_likeness")
       {
-        std::string fname = dirname + "dpd_d." + std::to_string(idx*1000) + ".data";
-        DatafileContent dfc(fname);
-        float aa = platelets_distance(dfc, mmt_atom_type, platelets_count);
-        std::cout << idx << " " << aa << std::endl;
+        std::string dir("poly_mod_likeness/");
+        std::vector<std::string> subdirs = {
+            "mmt_r10_n2_mod_n100_tail5_poly_p10_n50336/",
+            "mmt_r10_n2_mod_n200_tail5_poly_p10_n50276/",
+            "mmt_r10_n2_mod_n300_tail5_poly_p10_n50216/",
+            "mmt_r10_n2_mod_n400_tail5_poly_p10_n50156/"
+        };
+
+        for (size_t in_seria_idx = 0; in_seria_idx < 4; ++in_seria_idx)
+          {
+            for (size_t fname_idx = 0; fname_idx < 162; ++fname_idx)
+              {
+                std::string fname(dpd_dir + dir + subdirs[in_seria_idx]);
+                fname += "datafiles/dpd_d.";
+                fname += std::to_string(fname_idx * 1000);
+                fname += ".data";
+                fnames[in_seria_idx].push_back(fname);
+              }
+          }
       }
 
+    return fnames;
+}
+
+
+// Process folders for a seria of calculations
+void perform_seria(std::string regime)
+{
+    std::array<std::vector<std::string>,4> fnames(get_fnames(regime));
+
+    for (size_t in_seria_idx = 0; in_seria_idx < 4; ++in_seria_idx)
+      {
+        std::ofstream ofs("outs/" + regime + "_" + std::to_string(in_seria_idx));
+        for (size_t file_idx = 0; file_idx < fnames[in_seria_idx].size();
+            ++file_idx)
+          {
+            DatafileContent dfc(fnames[in_seria_idx][file_idx]);
+            float d = platelets_distance(dfc, MMT_ATOM_TYPE, PLATELETS_COUNT);
+            std::cout << in_seria_idx << " " << file_idx << " " << d << std::endl;
+            ofs << file_idx << " " << d << std::endl;
+          }
+        ofs.close();
+      }
+
+    return;
+}
+
+int main(int argc, char **argv)
+{
+    std::string regime("poly_mod_likeness");
+    perform_seria(regime);
+    
     return 0;
 }

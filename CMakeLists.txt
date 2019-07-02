@@ -48,7 +48,7 @@ endif (CMAKE_COMPILER_IS_GNUCXX)
 
 
 set (HEADERS
-    src/py_string.hpp
+    src/char_py_string.hpp
     src/datafile_content.hpp
     src/platelets_distance.hpp
     src/structures.hpp
@@ -57,4 +57,4 @@ set (HEADERS
 
 add_executable (test_exe ${HEADERS} main.cpp)
 
-#target_link_libraries(isolated_parallel Threads::Threads)
+#target_link_libraries(test_exe filesystem)

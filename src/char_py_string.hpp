@@ -2,67 +2,66 @@
 #define CHAR_PY_STRING_HPP
 
 
-//#include <iostream>
+// For the better performance, CharPyString stores lines
+// as char[LINESIZE], i.e. LINESIZE is a maximal length of the line
+#define LINESIZE 250
+
+
 #include <cstring>
-//#include <string>
 
 
-//double custom_strtod(const std::string& input)
+// A low-level and faster version of strtod taken from
+// https://stackoverflow.com/a/5832396/7927226
 double custom_strtod(const char *p)
 {
-    // https://stackoverflow.com/a/5832396/7927226
-    if (!*p || *p == '?')
-        return -1;
-    int s = 1;
-    while (*p == ' ') p++;
+    int sign = 1;
+    if (*p == '-')
+      {
+        sign = -1;
+        p++;
+      }
 
-    if (*p == '-') {
-        s = -1; p++;
-    }
+    double value = 0;
 
-    double acc = 0;
+    // Processing integer part
     while (*p >= '0' && *p <= '9')
-        acc = acc * 10 + *p++ - '0';
+      {
+        value = value * 10 + (*p++ - '0');
+      }
 
-    if (*p == '.') {
+    // Processing fraction part (if present)
+    if (*p == '.')
+      {
         double k = 0.1;
         p++;
-        while (*p >= '0' && *p <= '9') {
-            acc += (*p++ - '0') * k;
+        while (*p >= '0' && *p <= '9')
+          {
+            value += (*p++ - '0') * k;
             k *= 0.1;
-        }
-    }
-    return s * acc;
+          }
+      }
+
+    return sign * value;
 }
 
 
-// Wrapper above char *
+// Container for string that also has
+// .startswith() and .endswith() from Python's str
 class CharPyString
 {
 public:
     CharPyString(const char *cs)
     : _len(strlen(cs))
       {
-        this->_content = (char *)malloc(sizeof(char) * (strlen(cs) + 1));
-        memcpy(this->_content, cs, strlen(cs)+1);
+        memcpy(this->_content, cs, strlen(cs) + 1);
       };
 
-    CharPyString(const std::string str)
-      {
-        memcpy(this->_content, str.c_str(), str.size()+1);
-      };
-
-    char *content() const
-      {
-        return this->_content;
-      }
-
-    size_t len() const
+    const size_t len() const
       {
         return this->_len;
       }
 
-    bool startswith(const char * str) const
+    const bool startswith(const char *str) const
       {
         size_t len = strlen(str);
         if (len > this->_len)
@@ -73,41 +72,60 @@ public:
         return true;
       }
 
-    bool endswith(const char * str) const
+    const bool endswith(const char *str) const
       {
-        size_t len = strlen(str);
+        // When reading file in c-style in datafile_content.hpp,
+        // this->_content[this->_len - 1] is a terminating character, so
+        // this->_content[this->_len - 2] is a last valuable character.
+        // When reading via std::getline(ifstream), -1 is correct.
+        // delta should take care about this problem
+        size_t delta = 1;
+        if (this->_content[this->_len - 1] == '\0')
+          {
+            delta +=1;
+          } 
+
+        const size_t len = strlen(str);
         if (len > this->_len)
             return false;
 
         for (size_t idx = 0; idx < len; idx++)
+          {
             if (str[len - 1 - idx] != this->_content[this->_len - 1 - idx])
+              {
                 return false;
+              }
+          }
         return true;
       }
 
-    float word_as_float(size_t word_idx)
+    const float word_as_float(const size_t required_word_idx) const
       {
-        char *result = (char *)malloc(sizeof(char) * 25);  // why 25
-        size_t current_word = 0;
-        size_t letter_idx = 0;
-
-        for (size_t idx = 0; idx < this->_len; ++idx)
+        char result[LINESIZE];
+        size_t current_word_idx = 0;
+        size_t letter_in_chosen_word_idx = 0;
+        size_t chosen_word_length = 0;
+        for (size_t letter_idx = 0; letter_idx < this->_len; ++letter_idx)
           {
-            if (this->_content[idx] == ' ')
-                current_word++;
-            if (current_word == word_idx)
+            if (this->_content[letter_idx] == ' ')
               {
-                result[letter_idx] = this->_content[idx];
-                letter_idx++;
+                current_word_idx++;
+                continue;
+              }
+            if (current_word_idx == required_word_idx)
+              {
+                result[letter_in_chosen_word_idx] = this->_content[letter_idx];
+                letter_in_chosen_word_idx++;
+                chosen_word_length++;
               }
           }
-
+        result[chosen_word_length] = '\0';  // custom_strtod works with c-strings
         return custom_strtod(result);
       }
 
 private:
     size_t _len;
-    char *_content;
+    char _content[LINESIZE];
 };
 
 

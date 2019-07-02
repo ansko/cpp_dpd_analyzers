@@ -2,6 +2,9 @@
 #define DATAFILE_CONTENT_HPP
 
 
+#include <cstdlib>
+#include <cstdio>
+
 #include <array>
 #include <fstream>
 #include <iostream>
@@ -24,7 +27,7 @@ public:
       _pair_coeffs(nullptr), _bond_coeffs(nullptr), _angle_coeffs(nullptr),
       _dihedral_coeffs(nullptr), _improper_coeffs(nullptr)
       {
-        this->read();
+        this->read_datafile();
       }
 
     ~DatafileContent()
@@ -96,56 +99,57 @@ public:
     const std::tuple<float, int, int>* improper_coeffs() const
         { return this->_improper_coeffs; }
 
-    void read()
+    void read_datafile()
       {
         std::vector<CharPyString> lines;
         std::string buffer_line;
-        unsigned int masses_idx = 0,
-                     pair_coeffs_idx = 0,
-                     bond_coeffs_idx = 0,
-                     angle_coeffs_idx = 0,
-                     dihedral_coeffs_idx = 0,
-                     improper_coeffs_idx = 0,
-                     atoms_idx = 0,
-                     velocities_idx = 0,
-                     bonds_idx = 0,
-                     angles_idx = 0,
-                     dihedrals_idx = 0,
-                     impropers_idx = 0;
+        unsigned int masses_idx = 0;
+        unsigned int pair_coeffs_idx = 0;
+        unsigned int bond_coeffs_idx = 0;
+        unsigned int angle_coeffs_idx = 0;
+        unsigned int dihedral_coeffs_idx = 0;
+        unsigned int improper_coeffs_idx = 0;
+        unsigned int atoms_idx = 0;
+        unsigned int velocities_idx = 0;
+        unsigned int bonds_idx = 0;
+        unsigned int angles_idx = 0;
+        unsigned int dihedrals_idx = 0;
+        unsigned int impropers_idx = 0;
 
+        // Reading lines in c-style is not faster as i think;
+        // also, C getline produces lines with '\n'
         std::ifstream ifs(this->_fname);
-
         while (std::getline(ifs, buffer_line))
           {
             lines.push_back(buffer_line.c_str());
           }
 
-        // TODO maybe not 100
+        // TODO maybe not 100 (though it seems to be ok)
         std::vector<CharPyString> first_lines(lines.begin(), lines.begin() + 100);;
 
         for (size_t idx = 0; idx < first_lines.size(); ++idx)
           {
             if (first_lines[idx].endswith("atoms"))
-                this->_atoms_count = size_t(first_lines[idx].word_as_float(0));
+                this->_atoms_count = first_lines[idx].word_as_float(0);
             else if (first_lines[idx].endswith("bonds"))
-                this->_bonds_count = size_t(first_lines[idx].word_as_float(0));
+                this->_bonds_count = first_lines[idx].word_as_float(0);
             else if (first_lines[idx].endswith("angles"))
-                this->_angles_count = size_t(first_lines[idx].word_as_float(0));
+                this->_angles_count = first_lines[idx].word_as_float(0);
             else if (first_lines[idx].endswith("dihedrals"))
-                this->_dihedrals_count = size_t(first_lines[idx].word_as_float(0));
+                this->_dihedrals_count = first_lines[idx].word_as_float(0);
             else if (first_lines[idx].endswith("impropers"))
-                this->_impropers_count = size_t(first_lines[idx].word_as_float(0));
+                this->_impropers_count = first_lines[idx].word_as_float(0);
 
             else if (first_lines[idx].endswith("atom types"))
-                this->_atom_types = size_t(first_lines[idx].word_as_float(0));
+                this->_atom_types = first_lines[idx].word_as_float(0);
             else if (first_lines[idx].endswith("bond types"))
-                this->_bond_types = size_t(first_lines[idx].word_as_float(0));
+                this->_bond_types = first_lines[idx].word_as_float(0);
             else if (first_lines[idx].endswith("angle types"))
-                this->_angle_types = size_t(first_lines[idx].word_as_float(0));
+                this->_angle_types = first_lines[idx].word_as_float(0);
             else if (first_lines[idx].endswith("dihedral types"))
-                this->_dihedral_types = size_t(first_lines[idx].word_as_float(0));
+                this->_dihedral_types = first_lines[idx].word_as_float(0);
             else if (first_lines[idx].endswith("improper types"))
-                this->_improper_types = size_t(first_lines[idx].word_as_float(0));
+                this->_improper_types = first_lines[idx].word_as_float(0);
 
             else if (first_lines[idx].endswith("xlo xhi"))
               {
@@ -199,12 +203,13 @@ public:
           {
             this->_masses = (float *)malloc(
                 sizeof(float) * (this->_atom_types + 1));
+
             auto first = lines.begin() + masses_idx + 2;
             auto last = lines.begin() + masses_idx + 2 + this->_atom_types;
             for (auto &it = first; it != last; ++it)
               {
-                unsigned int key(it->word_as_float(0));
-                float mass = it->word_as_float(1);
+                const unsigned int key(it->word_as_float(0));
+                const float mass = it->word_as_float(1);
                 this->_masses[key] = mass;
               }
           }
@@ -218,9 +223,9 @@ public:
             auto last = lines.begin() + pair_coeffs_idx + 2 + this->_atom_types;
             for (auto &it = first; it != last; ++it)
               {
-                unsigned int key(it->word_as_float(0));
-                float eps = it->word_as_float(1);
-                float sig = it->word_as_float(2);
+                const unsigned int key(it->word_as_float(0));
+                const float eps = it->word_as_float(1);
+                const float sig = it->word_as_float(2);
                 this->_pair_coeffs[key] = {eps, sig};
               }
           }
@@ -234,9 +239,9 @@ public:
             auto last = lines.begin() + bond_coeffs_idx + 2 + this->_bond_types;
             for (auto &it = first; it != last; ++it)
               {
-                unsigned int key(it->word_as_float(0));
-                float k = it->word_as_float(1);
-                float l = it->word_as_float(2);
+                const unsigned int key(it->word_as_float(0));
+                const float k = it->word_as_float(1);
+                const float l = it->word_as_float(2);
                 this->_bond_coeffs[key] = {k, l};
               }
           }
@@ -250,9 +255,9 @@ public:
             auto last = lines.begin() + angle_coeffs_idx + 2 + this->_angle_types;
             for (auto &it = first; it != last; ++it)
               {
-                unsigned int key(it->word_as_float(0));
-                float k = it->word_as_float(1);
-                float theta = it->word_as_float(2);
+                const unsigned int key(it->word_as_float(0));
+                const float k = it->word_as_float(1);
+                const float theta = it->word_as_float(2);
                 this->_angle_coeffs[key] = {k, theta};
               }
           }
@@ -267,10 +272,10 @@ public:
                         + this->_dihedral_types;
             for (auto &it = first; it != last; ++it)
               {
-                unsigned int key(it->word_as_float(0));
-                float k = it->word_as_float(1);
-                int d(it->word_as_float(2));
-                int n(it->word_as_float(3));
+                const unsigned int key(it->word_as_float(0));
+                const float k = it->word_as_float(1);
+                const int d(it->word_as_float(2));
+                const int n(it->word_as_float(3));
                 this->_dihedral_coeffs[key] = {k, d, n};
               }
           }
@@ -285,10 +290,10 @@ public:
                         + this->_improper_types;
             for (auto &it = first; it != last; ++it)
               {
-                unsigned int key(it->word_as_float(0));
-                float k = it->word_as_float(1);
-                int d(it->word_as_float(2));
-                int n(it->word_as_float(3));
+                const unsigned int key(it->word_as_float(0));
+                const float k = it->word_as_float(1);
+                const int d(it->word_as_float(2));
+                const int n(it->word_as_float(3));
                 this->_improper_coeffs[key] = {k, d, n};
               }
           }
@@ -299,18 +304,18 @@ public:
             auto last = lines.begin() + atoms_idx + 2 + this->_atoms_count;
             for (auto &it = first; it != last; ++it)
               {
-                int atom_id(it->word_as_float(0));
-                int molecule_tag(it->word_as_float(1));
-                int atom_type_id (it->word_as_float(2));
-                float q = (it->word_as_float(3));
-                float x = (it->word_as_float(4));
-                float y = (it->word_as_float(5));
-                float z = (it->word_as_float(6));
-                int nx(it->word_as_float(7));
-                int ny(it->word_as_float(8));
-                int nz(it->word_as_float(9));
-                this->_atoms[atom_id] = Atom(atom_id, molecule_tag,
-                    atom_type_id, q, x, y, z, nx, ny, nz);
+                const int atom_id(it->word_as_float(0));
+                const int molecule_tag(it->word_as_float(1));
+                const int atom_type_id (it->word_as_float(2));
+                const float q = (it->word_as_float(3));
+                const float x = (it->word_as_float(4));
+                const float y = (it->word_as_float(5));
+                const float z = (it->word_as_float(6));
+                const int nx(it->word_as_float(7));
+                const int ny(it->word_as_float(8));
+                const int nz(it->word_as_float(9));
+                this->_atoms[atom_id] = Atom(atom_id, molecule_tag, atom_type_id,
+                    q, x, y, z, nx, ny, nz);
             }
         }
 
@@ -322,11 +327,11 @@ public:
             auto last = lines.begin() + velocities_idx + 2 + this->_atoms_count;
             for (auto &it = first; it != last; ++it)
               {
-                size_t atom_id(it->word_as_float(0));
-                float vx = (it->word_as_float(1));
-                float vy = (it->word_as_float(2));
-                float vz = (it->word_as_float(3));
-                std::array<float, 3> v{ {vx, vy, vz} };
+                const size_t atom_id(it->word_as_float(0));
+                const float vx = (it->word_as_float(1));
+                const float vy = (it->word_as_float(2));
+                const float vz = (it->word_as_float(3));
+                std::array<float, 3> v{{vx, vy, vz}};
               }
           }
 
@@ -338,10 +343,10 @@ public:
             for (auto &it = first; it != last; ++it)
               {
             
-                int bond_id(it->word_as_float(0));
-                int bond_type_id(it->word_as_float(1));
-                int atom_one_id(it->word_as_float(2));
-                int atom_two_id(it->word_as_float(3));
+                const int bond_id(it->word_as_float(0));
+                const int bond_type_id(it->word_as_float(1));
+                const int atom_one_id(it->word_as_float(2));
+                const int atom_two_id(it->word_as_float(3));
                 this->_bonds[bond_id] = Bond(bond_id, bond_type_id,
                     atom_one_id, atom_two_id);
               }
@@ -355,11 +360,11 @@ public:
             auto last = lines.begin() + angles_idx + 2 + this->_angles_count;
             for (auto &it = first; it != last; ++it)
               {
-                int angle_id(it->word_as_float(0));
-                int angle_type_id(it->word_as_float(1));
-                int atom_one_id(it->word_as_float(2));
-                int atom_two_id(it->word_as_float(3));
-                int atom_three_id(it->word_as_float(4));
+                const int angle_id(it->word_as_float(0));
+                const int angle_type_id(it->word_as_float(1));
+                const int atom_one_id(it->word_as_float(2));
+                const int atom_two_id(it->word_as_float(3));
+                const int atom_three_id(it->word_as_float(4));
                 this->_angles[angle_id] = Angle(angle_id, angle_type_id,
                     atom_one_id, atom_two_id, atom_three_id);
               }
@@ -373,12 +378,12 @@ public:
             auto last = lines.begin() + dihedrals_idx + 2 + this->_dihedrals_count;
             for (auto &it = first; it != last; ++it)
               {
-                int dihedral_id(it->word_as_float(0));
-                int dihedral_type_id(it->word_as_float(1));
-                int atom_one_id(it->word_as_float(2));
-                int atom_two_id(it->word_as_float(3));
-                int atom_three_id(it->word_as_float(4));
-                int atom_four_id(it->word_as_float(5));
+                const int dihedral_id(it->word_as_float(0));
+                const int dihedral_type_id(it->word_as_float(1));
+                const int atom_one_id(it->word_as_float(2));
+                const int atom_two_id(it->word_as_float(3));
+                const int atom_three_id(it->word_as_float(4));
+                const int atom_four_id(it->word_as_float(5));
                 this->_dihedrals[dihedral_id] = Dihedral(
                     dihedral_id, dihedral_type_id,
                     atom_one_id, atom_two_id, atom_three_id, atom_four_id);
@@ -393,12 +398,12 @@ public:
             auto last = lines.begin() + impropers_idx + 2 + this->_impropers_count;
             for (auto &it = first; it != last; ++it)
               {
-                int improper_id(it->word_as_float(0));
-                int improper_type_id(it->word_as_float(1));
-                int atom_one_id(it->word_as_float(2));
-                int atom_two_id(it->word_as_float(3));
-                int atom_three_id(it->word_as_float(4));
-                int atom_four_id(it->word_as_float(5));
+                const int improper_id(it->word_as_float(0));
+                const int improper_type_id(it->word_as_float(1));
+                const int atom_one_id(it->word_as_float(2));
+                const int atom_two_id(it->word_as_float(3));
+                const int atom_three_id(it->word_as_float(4));
+                const int atom_four_id(it->word_as_float(5));
                 this->_impropers[improper_id] = Improper(
                     improper_id, improper_type_id,
                     atom_one_id, atom_two_id, atom_three_id, atom_four_id);

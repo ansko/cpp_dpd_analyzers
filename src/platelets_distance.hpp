@@ -11,13 +11,21 @@
 #include "structures.hpp"
 
 
-float platelets_distance(DatafileContent &dfc, size_t mmt_atom_type,
+const float platelets_distance(DatafileContent &dfc, size_t mmt_atom_type,
 size_t platelets_count)
 {
     const Atom *all_atoms = dfc.atoms();
-    Atom *mmt_atoms = (Atom *)malloc(sizeof(Atom) * dfc.atoms_count());
 
-    // Extract only MMT atoms from dfc.
+    // Extract only MMT atoms
+    size_t mmt_atoms_count(0);
+    for (size_t idx = 0; idx < dfc.atoms_count(); idx++)
+      {
+        if (all_atoms[idx].type() == mmt_atom_type)
+          {
+            mmt_atoms_count++;
+          }
+      }
+    Atom *mmt_atoms = (Atom *)malloc(sizeof(Atom) * mmt_atoms_count);
     size_t mmt_atoms_found = 0;
     for (size_t idx = 0; idx < dfc.atoms_count(); idx++)
       {
@@ -35,7 +43,7 @@ size_t platelets_count)
         return -1;
       }
     std::map<unsigned int, std::vector<Atom> > atoms_onto_plats;
-    size_t in_plat = mmt_atoms_found / platelets_count;
+    const size_t in_plat = mmt_atoms_found / platelets_count;
     {
         for (size_t plat_idx = 0; plat_idx < platelets_count; ++plat_idx)
           {
@@ -48,23 +56,24 @@ size_t platelets_count)
           }
     }
 
-    // Get result.
+    // Get result
     float ave(0);
     {
         std::vector<std::vector<float> > results(platelets_count,
             std::vector<float>(platelets_count,0));
-        float lx(dfc.xhi() - dfc.xlo());
-        float ly(dfc.yhi() - dfc.ylo());
-        float lz(dfc.zhi() - dfc.zlo());
-        float big_distance(std::max(std::max(lx, ly), lz));
+        const float lx(dfc.xhi() - dfc.xlo());
+        const float ly(dfc.yhi() - dfc.ylo());
+        const float lz(dfc.zhi() - dfc.zlo());
+        const float big_distance(std::max(std::max(lx, ly), lz));
         for(size_t idx1 = 0; idx1 < platelets_count; ++idx1)
           {
-            size_t n1(atoms_onto_plats[idx1].size());
+            const size_t n1(atoms_onto_plats[idx1].size());
             for(size_t idx2 = idx1 + 1; idx2 < platelets_count; ++idx2)
               {
-                size_t n2(atoms_onto_plats[idx2].size());
+                const size_t n2(atoms_onto_plats[idx2].size());
                 for (auto &atom1 : atoms_onto_plats[idx1])
                   {
+                    // TODO: Closest may be not the best way
                     float closest(big_distance);
                     for (auto &atom2 : atoms_onto_plats[idx2])
                       {
@@ -88,6 +97,9 @@ size_t platelets_count)
           }
         ave /= platelets_count - 1;
     }
+
+    free(mmt_atoms);
+
     return ave;
 }
 
