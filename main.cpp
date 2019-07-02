@@ -18,7 +18,7 @@ std::array<std::vector<std::string>,4> get_fnames(std::string regime)
 
     if (regime == "poly_mod_likeness")
       {
-        std::string dir("poly_mod_likeness/");
+        std::string dir("NOT_SO_GOOD/poly_mod_likeness/");
         std::vector<std::string> subdirs = {
             "mmt_r10_n2_mod_n100_tail5_poly_p10_n50336/",
             "mmt_r10_n2_mod_n200_tail5_poly_p10_n50276/",
@@ -55,15 +55,17 @@ void perform_seria(std::string regime)
             ++file_idx)
           {
             DatafileContent dfc(fnames[in_seria_idx][file_idx]);
-            float d = platelets_distance(dfc, MMT_ATOM_TYPE, PLATELETS_COUNT);
-            std::cout << in_seria_idx << " " << file_idx << " " << d << std::endl;
-            ofs << file_idx << " " << d << std::endl;
+            auto &d = platelets_distance(dfc, MMT_ATOM_TYPE, PLATELETS_COUNT);
+            std::cout << in_seria_idx << " " << file_idx << " "
+                << d.first << " " << d.second << std::endl;
+            ofs << file_idx << " " << d.first << " " << d.second << std::endl;
           }
         ofs.close();
       }
 
     return;
 }
+
 
 int main(int argc, char **argv)
 {
