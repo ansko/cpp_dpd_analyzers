@@ -50,6 +50,7 @@ endif (CMAKE_COMPILER_IS_GNUCXX)
 set (HEADERS
     src/char_py_string.hpp
     src/datafile_content.hpp
+    src/get_fnames.hpp
     src/platelets_distance.hpp
     src/structures.hpp
 )

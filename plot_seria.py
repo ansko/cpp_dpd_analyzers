@@ -19,11 +19,46 @@ import matplotlib.pyplot as plt
 if __name__ == '__main__':
     regime = sys.argv[1]
 
-    title = regime
-    fnames = ['outs/' + regime + "_" + str(idx) for idx in range(4)]
-    legends = ['1', '1', '2', '2', '3', '3', '4', '4']
+    title = ''
+    fnames = []
+    legends = []
+    ylims = []
 
-    ylims = [0, 10]
+    if regime == 'poly_mod_likeness':
+        title = 'Полимер и хвост модификатора отталкиваются слабо'
+        fnames = ['outs/' + regime + "_" + str(idx) for idx in range(4)]
+        legends = [
+            '100, ave', '100, closest',
+            '200, ave', '200, closest',
+            '300, ave', '300, closest',
+            '400, ave', '400, closest'
+        ]
+        ylims = [0, 5]
+    elif regime == 'article_params':
+        title = 'Параметры из статей итальянцев'
+        fnames = ['outs/' + regime + "_" + str(idx) for idx in range(4)]
+        legends = [
+            '100, ave', '100, closest',
+            '200, ave', '200, closest',
+            '300, ave', '300, closest',
+            '400, ave', '400, closest'
+        ]
+        ylims = [0, 5]
+    elif regime == 'npt_attraction':
+        title = ('Полимер и хвост модификатора отталкиваются слабо'
+                 '\nно (a_ij большие)')
+        fnames = ['outs/' + regime + "_" + str(idx) for idx in range(4)]
+        legends = [
+            '100, ave', '100, closest',
+            '200, ave', '200, closest',
+            '300, ave', '300, closest',
+            '400, ave', '400, closest'
+        ]
+        ylims = [0, 5]
+
+    else:
+        raise NotImplemented
+
     xlabel = r'Время, k$\tau$'
     ylabel = r'Расстояние в $r_c$ ($r_c$ = 5.23$\AA$)'
     out_fname = regime + '.pdf'
@@ -45,7 +80,6 @@ if __name__ == '__main__':
         colors.pop(colors.index(color))
         new_line, = plt.plot(xs, ys, color, label=legends[idx], linewidth=3)
         plotted_lines.append(new_line)
-        #try:
         new_line, = plt.plot(xs, ys2, color, label=legends[idx], linewidth=1)
         plotted_lines.append(new_line)
         
