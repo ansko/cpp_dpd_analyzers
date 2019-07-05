@@ -6,6 +6,13 @@
 #include <vector>
 
 
+std::vector<std::string> AVAILABLE_REGIMES = {
+    "article_params",
+    "npt_attraction",
+    "poly_mod_likeness"
+};
+
+
 std::vector<std::vector<std::string>> get_fnames(std::string regime)
 {
     std::string dpd_dir("/media/anton/Seagate Expansion Drive/dpd_calculations/");
