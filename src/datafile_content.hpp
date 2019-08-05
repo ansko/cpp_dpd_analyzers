@@ -124,78 +124,75 @@ public:
             lines.push_back(buffer_line.c_str());
           }
 
-        // TODO maybe not 100 (though it seems to be ok)
-        std::vector<CharPyString> first_lines(lines.begin(), lines.begin() + 100);;
-
-        for (size_t idx = 0; idx < first_lines.size(); ++idx)
+        for (size_t idx = 0; idx < lines.size(); ++idx)
           {
-            if (first_lines[idx].endswith("atoms"))
-                this->_atoms_count = first_lines[idx].word_as_float(0);
-            else if (first_lines[idx].endswith("bonds"))
-                this->_bonds_count = first_lines[idx].word_as_float(0);
-            else if (first_lines[idx].endswith("angles"))
-                this->_angles_count = first_lines[idx].word_as_float(0);
-            else if (first_lines[idx].endswith("dihedrals"))
-                this->_dihedrals_count = first_lines[idx].word_as_float(0);
-            else if (first_lines[idx].endswith("impropers"))
-                this->_impropers_count = first_lines[idx].word_as_float(0);
+            if (lines[idx].endswith("atoms"))
+                this->_atoms_count = lines[idx].word_as_float(0);
+            else if (lines[idx].endswith("bonds"))
+                this->_bonds_count = lines[idx].word_as_float(0);
+            else if (lines[idx].endswith("angles"))
+                this->_angles_count = lines[idx].word_as_float(0);
+            else if (lines[idx].endswith("dihedrals"))
+                this->_dihedrals_count = lines[idx].word_as_float(0);
+            else if (lines[idx].endswith("impropers"))
+                this->_impropers_count = lines[idx].word_as_float(0);
 
-            else if (first_lines[idx].endswith("atom types"))
-                this->_atom_types = first_lines[idx].word_as_float(0);
-            else if (first_lines[idx].endswith("bond types"))
-                this->_bond_types = first_lines[idx].word_as_float(0);
-            else if (first_lines[idx].endswith("angle types"))
-                this->_angle_types = first_lines[idx].word_as_float(0);
-            else if (first_lines[idx].endswith("dihedral types"))
-                this->_dihedral_types = first_lines[idx].word_as_float(0);
-            else if (first_lines[idx].endswith("improper types"))
-                this->_improper_types = first_lines[idx].word_as_float(0);
+            else if (lines[idx].endswith("atom types"))
+                this->_atom_types = lines[idx].word_as_float(0);
+            else if (lines[idx].endswith("bond types"))
+                this->_bond_types = lines[idx].word_as_float(0);
+            else if (lines[idx].endswith("angle types"))
+                this->_angle_types = lines[idx].word_as_float(0);
+            else if (lines[idx].endswith("dihedral types"))
+                this->_dihedral_types = lines[idx].word_as_float(0);
+            else if (lines[idx].endswith("improper types"))
+                this->_improper_types = lines[idx].word_as_float(0);
 
-            else if (first_lines[idx].endswith("xlo xhi"))
+            else if (lines[idx].endswith("xlo xhi"))
               {
-                this->_xlo = first_lines[idx].word_as_float(0);
-                this->_xhi = first_lines[idx].word_as_float(1);
+                this->_xlo = lines[idx].word_as_float(0);
+                this->_xhi = lines[idx].word_as_float(1);
               }
-            else if (first_lines[idx].endswith("ylo yhi"))
+            else if (lines[idx].endswith("ylo yhi"))
               {
-                this->_ylo = first_lines[idx].word_as_float(0);
-                this->_yhi = first_lines[idx].word_as_float(1);
+                this->_ylo = lines[idx].word_as_float(0);
+                this->_yhi = lines[idx].word_as_float(1);
               }
-            else if (first_lines[idx].endswith("zlo zhi"))
+            else if (lines[idx].endswith("zlo zhi"))
               {
-                this->_zlo = first_lines[idx].word_as_float(0);
-                this->_zhi = first_lines[idx].word_as_float(1);
+                this->_zlo = lines[idx].word_as_float(0);
+                this->_zhi = lines[idx].word_as_float(1);
               }
-            else if (first_lines[idx].endswith("xy xz yz"))
+            else if (lines[idx].endswith("xy xz yz"))
               {
-                this->_xy = first_lines[idx].word_as_float(0);
-                this->_xz = first_lines[idx].word_as_float(1);
-                this->_yz = first_lines[idx].word_as_float(2);
+                this->_xy = lines[idx].word_as_float(0);
+                this->_xz = lines[idx].word_as_float(1);
+                this->_yz = lines[idx].word_as_float(2);
               }
 
-            else if (first_lines[idx].endswith("Masses"))
+            else if (lines[idx].endswith("Masses"))
                 masses_idx = idx;
-            else if (first_lines[idx].startswith("Pair Coeffs"))
+            else if (lines[idx].startswith("Pair Coeffs"))
                 pair_coeffs_idx = idx;
-            else if (first_lines[idx].startswith("Bond Coeffs"))
+            else if (lines[idx].startswith("Bond Coeffs"))
                 bond_coeffs_idx = idx;
-            else if (first_lines[idx].startswith("Angle Coeffs"))
+            else if (lines[idx].startswith("Angle Coeffs"))
                 angle_coeffs_idx = idx;
-            else if (first_lines[idx].startswith("Dihedral Coeffs"))
+            else if (lines[idx].startswith("Dihedral Coeffs"))
                 dihedral_coeffs_idx = idx;
-            else if (first_lines[idx].startswith("Improper Coeffs"))
+            else if (lines[idx].startswith("Improper Coeffs"))
                 improper_coeffs_idx = idx;
-            else if (first_lines[idx].startswith("Atoms"))
+            else if (lines[idx].startswith("Atoms"))
                 atoms_idx = idx;
-            else if (first_lines[idx].startswith("Velocities"))
+            else if (lines[idx].startswith("Velocities"))
                 velocities_idx = idx;
-            else if (first_lines[idx].startswith("Bonds"))
+            else if (lines[idx].startswith("Bonds"))
                 bonds_idx = idx;
-            else if (first_lines[idx].startswith("Angles"))
+            else if (lines[idx].startswith("Angles"))
                 angles_idx = idx;
-            else if (first_lines[idx].startswith("Dihedrals"))
+            else if (lines[idx].startswith("Dihedrals"))
                 dihedrals_idx = idx;
-            else if (first_lines[idx].startswith("Impropers"))
+            else if (lines[idx].startswith("Impropers"))
                 impropers_idx = idx;
           }
 

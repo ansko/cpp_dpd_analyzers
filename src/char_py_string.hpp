@@ -10,41 +10,6 @@
 #include <cstring>
 
 
-// A low-level and faster version of strtod taken from
-// https://stackoverflow.com/a/5832396/7927226
-double custom_strtod(const char *p)
-{
-    int sign = 1;
-    if (*p == '-')
-      {
-        sign = -1;
-        p++;
-      }
-
-    double value = 0;
-
-    // Processing integer part
-    while (*p >= '0' && *p <= '9')
-      {
-        value = value * 10 + (*p++ - '0');
-      }
-
-    // Processing fraction part (if present)
-    if (*p == '.')
-      {
-        double k = 0.1;
-        p++;
-        while (*p >= '0' && *p <= '9')
-          {
-            value += (*p++ - '0') * k;
-            k *= 0.1;
-          }
-      }
-
-    return sign * value;
-}
-
-
 // Container for string that also has
 // .startswith() and .endswith() from Python's str
 class CharPyString
@@ -120,7 +85,9 @@ public:
               }
           }
         result[chosen_word_length] = '\0';  // custom_strtod works with c-strings
-        return custom_strtod(result);
+        //return custom_strtod(result);
+        char *p; // ???
+        return strtod(result, &p);
       }
 
 private:
