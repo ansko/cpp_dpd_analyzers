@@ -1,3 +1,6 @@
+// Should be removed (correct but deprecated)
+
+
 #ifndef PERFORM_SERIA_HPP
 #define PERFORM_SERIA_HPP
 
@@ -31,8 +34,6 @@ void perform_seria(std::string regime, size_t mmt_atom_type, size_t platelets_co
               {
                 continue;
               }
-            //close(fp);
-
             DatafileContent dfc(fnames[in_seria_idx][file_idx]);
             auto &d = platelets_distance(dfc, mmt_atom_type, platelets_count);
             std::cout << in_seria_idx << " " << file_idx << " "
@@ -46,4 +47,4 @@ void perform_seria(std::string regime, size_t mmt_atom_type, size_t platelets_co
 }
 
 
-#endif  // PERFORM_SERIA_HPP
+#endif  // PERFORM_SERIA_HPP include guard

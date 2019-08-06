@@ -26,6 +26,7 @@ find_package(Threads REQUIRED)
 #     GENERAL_OUTPUT       print only main information
 #     PARTIAL_DATAFILES    write out some incomplete datafiles (for debug mainly)
 
+
 if (CMAKE_COMPILER_IS_GNUCXX)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}\
             -Werror \
@@ -37,14 +38,6 @@ if (CMAKE_COMPILER_IS_GNUCXX)
             -DGENERAL_OUTPUT \
     ")
 endif (CMAKE_COMPILER_IS_GNUCXX)
-
-#https://stackoverflow.com/a/9328525/7927226
-#get_cmake_property(_variableNames VARIABLES)
-#list (SORT _variableNames)
-#foreach (_variableName ${_variableNames})
-#    message(STATUS "${_variableName}=${${_variableName}}")
-#endforeach()
-
 
 
 set (HEADERS
@@ -58,9 +51,12 @@ set (HEADERS
     src/get_rdf.hpp
 )
 
+set (SOURCES
+    src/platelets_distance.cpp
+    src/get_rdf.cpp
+)
 
-add_executable (test_exe ${HEADERS} main.cpp)
 
-add_executable (rdf_exe ${HEADERS} rdf.cpp)
+add_executable (test_exe ${HEADERS} ${SOURCES} main.cpp)
 
-#target_link_libraries(test_exe filesystem)
+add_executable (rdf_exe ${HEADERS} ${SOURCES} rdf.cpp)

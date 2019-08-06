@@ -78,16 +78,10 @@ private:
 };
 
 
+// Since dihedrals and impropers are quite similar
 class DihedralImproperBase
 {
 public:
-    DihedralImproperBase(unsigned int id, unsigned int type,
-        unsigned int atom_one_id, unsigned int atom_two_id,
-        unsigned int atom_three_id, unsigned int atom_four_id)
-    : _id(id), _type(type), _atom_one_id(atom_one_id), _atom_two_id(atom_two_id),
-      _atom_three_id(atom_three_id), _atom_four_id(atom_four_id)
-    {}
-
     const unsigned int id() const { return this->_id; }
     const unsigned int type() const { return this->_type; }
     const unsigned int atom_one_id() const { return this->_atom_one_id; }
@@ -96,13 +90,20 @@ public:
     const unsigned int atom_four_id() const { return this->_atom_three_id; }
 
 protected:
+    DihedralImproperBase(unsigned int id, unsigned int type,
+        unsigned int atom_one_id, unsigned int atom_two_id,
+        unsigned int atom_three_id, unsigned int atom_four_id)
+    : _id(id), _type(type), _atom_one_id(atom_one_id), _atom_two_id(atom_two_id),
+      _atom_three_id(atom_three_id), _atom_four_id(atom_four_id)
+    {}
+
     unsigned int _id;
     unsigned int _type;
     unsigned int _atom_one_id, _atom_two_id, _atom_three_id, _atom_four_id;
 };
 
 
-class Dihedral : public DihedralImproperBase
+class Dihedral : private DihedralImproperBase
 {
 public:
     Dihedral(unsigned int id, unsigned int type,
@@ -114,7 +115,7 @@ public:
 };
 
 
-class Improper : public DihedralImproperBase
+class Improper : private DihedralImproperBase
 {
 public:
     Improper(unsigned int id, unsigned int type,
@@ -126,4 +127,4 @@ public:
 };
 
 
-#endif  //  STRUCTURES_HPP
+#endif  //  STRUCTURES_HPP include guard

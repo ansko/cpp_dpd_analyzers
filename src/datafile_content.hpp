@@ -18,6 +18,7 @@
 #include "char_py_string.hpp"
 
 
+// Container for datafile reading
 class DatafileContent
 {
 public:
@@ -438,4 +439,4 @@ private:
 };
 
 
-#endif  //  DATAFILE_CONTENT_HPP
+#endif  //  DATAFILE_CONTENT_HPP include guard

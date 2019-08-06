@@ -1,3 +1,6 @@
+// Should be removed (correct but deprecated)
+
+
 #ifndef GET_FNAMES_HPP
 #define GET_FNAMES_HPP
 
@@ -98,4 +101,4 @@ std::vector<std::vector<std::string>> get_fnames(std::string regime)
 }
 
 
-#endif  // GET_FNAMES_HPP
+#endif  // GET_FNAMES_HPP include guard

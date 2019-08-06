@@ -10,8 +10,9 @@
 #include <cstring>
 
 
-// Container for string that also has
+// Container for the string, which also has
 // .startswith() and .endswith() from Python's str
+// and couple of another useful methods.
 class CharPyString
 {
 public:
@@ -84,10 +85,8 @@ public:
                 chosen_word_length++;
               }
           }
-        result[chosen_word_length] = '\0';  // custom_strtod works with c-strings
-        //return custom_strtod(result);
-        char *p; // ???
-        return strtod(result, &p);
+        result[chosen_word_length] = '\0';
+        return strtod(result, nullptr);
       }
 
 private:
@@ -96,4 +95,4 @@ private:
 };
 
 
-#endif  // CHAR_PY_STRING_HPP
+#endif  // CHAR_PY_STRING_HPP include guard
