@@ -54,9 +54,13 @@ set (HEADERS
     src/perform_seria.hpp
     src/platelets_distance.hpp
     src/structures.hpp
+
+    src/get_rdf.hpp
 )
 
 
 add_executable (test_exe ${HEADERS} main.cpp)
+
+add_executable (rdf_exe ${HEADERS} rdf.cpp)
 
 #target_link_libraries(test_exe filesystem)
